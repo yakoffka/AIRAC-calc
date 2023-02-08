@@ -1,4 +1,4 @@
-## Библиотека для работы с циклами AIRAC для фреймворка Laravel
+## Библиотека для расчетов циклов AIRAC для фреймворка Laravel
 
 AIRAC - система заблаговременного уведомления об изменениях аэронавигационных данных по единой таблице дат вступления
 их в силу.
@@ -11,7 +11,7 @@ AIRAC - Aeronautical Information Regulation And Control (Регламентир�
 
 ## Установка
 ```
-composer require yakoffka/airac-cycle-dates-for-laravel 0.0.2 
+composer require yakoffka/airac-calc 0.0.3 
 ```
 
 
@@ -25,14 +25,14 @@ composer require yakoffka/airac-cycle-dates-for-laravel 0.0.2
 
 ### примеры использования с указанием даты:
 ```
-AiracCycle::getCycleDay(\Carbon\Carbon::createFromDate(2023, 2, 8)): int            //  14
-AiracCycle::getCurrentCycle(\Carbon\Carbon::createFromDate(2023, 2, 8)): string     //  "2301"
-AiracCycle::getNextCycle(\Carbon\Carbon::createFromDate(2023, 2, 8)): string        //  "2302"
+AiracCalc::getCycleDay(\Carbon\Carbon::createFromDate(2023, 2, 8)): int            //  14
+AiracCalc::getCurrentCycle(\Carbon\Carbon::createFromDate(2023, 2, 8)): string     //  "2301"
+AiracCalc::getNextCycle(\Carbon\Carbon::createFromDate(2023, 2, 8)): string        //  "2302"
 ```
 
 ### примеры использования без указания даты:
 ```
-AiracCycle::getNextCycle()      //  14
-AiracCycle::getCurrentCycle()   //  "2301"
-AiracCycle::getNextCycle()      //  "2302"
+AiracCalc::getNextCycle()      //  14
+AiracCalc::getCurrentCycle()   //  "2301"
+AiracCalc::getNextCycle()      //  "2302"
 ```

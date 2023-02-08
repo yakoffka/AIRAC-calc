@@ -1,6 +1,6 @@
 {
-    "name": "yakoffka/airac-cycle-dates-for-laravel",
-    "description": "Laravel package for working with AIRAC cycles",
+    "name": "yakoffka/airac-calc",
+    "description": "Laravel package for calculate AIRAC cycles",
     "type": "library",
     "require": {
         "nesbot/carbon": "^2.66"
@@ -11,12 +11,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Yakoffka\\AiracCycleDatesForLaravel\\": "src/"
+            "Yakoffka\\AiracCalc\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Yakoffka\\AiracCycleDatesForLaravel\\Tests\\": "tests/"
+            "Yakoffka\\AiracCalc\\Tests\\": "tests/"
         }
     },
     "authors": [
@@ -28,10 +28,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Yakoffka\\AiracCycleDatesForLaravel\\AiracCycleServiceProvider"
+                "Yakoffka\\AiracCalc\\AiracCalcServiceProvider"
             ],
             "aliases": {
-                "AiracCycle": "Yakoffka\\AiracCycleDatesForLaravel\\AiracCycleServiceFacade"
+                "AiracCalc": "Yakoffka\\AiracCalc\\AiracCalcServiceFacade"
             }
         }
     },

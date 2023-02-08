@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Yakoffka\AiracCycleDatesForLaravel;
+namespace Yakoffka\AiracCalc;
 
 use Carbon\Carbon;
 
@@ -14,7 +14,7 @@ use Carbon\Carbon;
  * AIRAC - Aeronautical Information Regulation And Control (Регламентирование и контроль аэронавигационной информации).
  * Один год содержит 13, реже 14 (1976, 1998 и 2020) циклов AIRAC.
  */
-class AiracCycleService
+class AiracCalcService
 {
     /**
      * Количество дней в цикле

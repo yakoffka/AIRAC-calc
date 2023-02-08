@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Yakoffka\AiracCycleDatesForLaravel;
+namespace Yakoffka\AiracCalc;
 
 use Illuminate\Support\ServiceProvider;
 
 /**
- * Yo\AiracCycleDatesForLaravel\AiracCycleServiceProvider
+ * Yo\AiracCalc\AiracCalcServiceProvider
  */
-class AiracCycleServiceProvider extends ServiceProvider
+class AiracCalcServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
@@ -17,7 +17,7 @@ class AiracCycleServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(AiracCycleService::class);
+        $this->app->bind(AiracCalcService::class);
     }
 
     /**
