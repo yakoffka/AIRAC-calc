@@ -1,0 +1,43 @@
+{
+    "name": "yakoffka/airac-cycle-dates-for-laravel",
+    "description": "Laravel package for working with AIRAC cycles",
+    "type": "library",
+    "require": {
+        "nesbot/carbon": "^2.66"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^7.22"
+    },
+    "license": "MIT license",
+    "autoload": {
+        "psr-4": {
+            "Yakoffka\\AiracCycleDatesForLaravel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Yakoffka\\AiracCycleDatesForLaravel\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "yakoffka",
+            "email": "yagithub@mail.ru"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Yakoffka\\AiracCycleDatesForLaravel\\AiracCycleServiceProvider"
+            ],
+            "aliases": {
+                "AiracCycle": "Yakoffka\\AiracCycleDatesForLaravel\\AiracCycleServiceFacade"
+            }
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@php vendor/bin/testbench package:discover --ansi"
+        ]
+    }
+}
