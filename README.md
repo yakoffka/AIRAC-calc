@@ -17,7 +17,7 @@ composer require yakoffka/airac-calc 0.0.3
 
 ## Использование
 Пакет предоставляет три метода, принимающих необязательный параметр Carbon $date:
-- getNextCycle(?Carbon $date): int - получение номера дня в цикле AIRAC для переданной даты;
+- getCycleDay(?Carbon $date): int - получение номера дня в цикле AIRAC для переданной даты;
 - getCurrentCycle(?Carbon $date): string - получение текущего цикла AIRAC для переданной даты;
 - getNextCycle(?Carbon $date): string - получение цикла AIRAC, следующего за текущим для переданной даты.
 
