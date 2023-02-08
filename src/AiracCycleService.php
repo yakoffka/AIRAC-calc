@@ -31,7 +31,7 @@ class AiracCycleService
      public ?Carbon $standard = null;
 
     /**
-     *
+     * Установка значения даты начала эталонного первого цикла AIRAC
      */
     public function __construct()
     {
@@ -40,14 +40,13 @@ class AiracCycleService
 
     /**
      * Получение дня цикла для переданной (или текущей) даты: от 1 до 28
+     * AiracCycle::getCycleDay()
      *
      * @param Carbon|null $datetime
      * @return int
      */
     public function getCycleDay(?Carbon $datetime = null): int
     {
-        // App\Services\Airac\AiracService::getCycleDay(now()->subDays(2));
-        // App\Services\Airac\AiracService::getCycleDay(\Carbon\Carbon::createFromDate(2023, 01, 26));
         $datetime ??= now();
         $datetime->setTime(0, 0);
 
@@ -70,15 +69,8 @@ class AiracCycleService
      */
     private function getSignDiffInDays(Carbon $datetime): int
     {
-        // $standard = Carbon::createFromDate(...self::STANDARD_DATA);
-        // $standard->setTime(0, 0);
         $diffInDays = $this->standard->diffInDays($datetime);
-        dump('standart = ' . $this->standard->format('Y-m-d H:i:s'));
-        dump('$datetime = ' . $datetime->format('Y-m-d H:i:s'));
-        dump('diffInDays = ' . $diffInDays);
         $sign = $this->standard->greaterThan($datetime) ? -1 : 1;
-        dump('$sign = ' . $sign);
-        dump('DiffInDays = ' . ($sign * $diffInDays));
 
         return $sign * $diffInDays;
     }
