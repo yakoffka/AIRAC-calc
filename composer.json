@@ -8,7 +8,7 @@
     "require-dev": {
         "orchestra/testbench": "^7.22"
     },
-    "license": "MIT license",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Yakoffka\\AiracCycleDatesForLaravel\\": "src/"
