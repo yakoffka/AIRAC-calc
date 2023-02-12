@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Yakoffka\AiracCalc;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 /**
  * Методы для расчетов, связанных с циклами AIRAC.
@@ -89,11 +90,11 @@ class AiracCalcService
         $datetime = $this->normalizeDate($datetime);
 
         $cycleDay = $this->getCycleDay($datetime);
-        $datetimeStartCurrentCycle = $datetime->subDays($cycleDay);
+        $datetimeStartCurrentCycle = $datetime->subDays($cycleDay - 1);
         $dayOfYear = $datetimeStartCurrentCycle->dayOfYear();
         $numCycle = intdiv($dayOfYear, $this::DAYS_IN_CYCLE) + 1;
 
-        $startNextYear = Carbon::createFromDate($datetime->year + 1, 1, 1);
+        $startNextYear = Carbon::createFromDate($datetimeStartCurrentCycle->year + 1, 1, 1);
         $startNextYear->setTime(0, 0);
 
         $daysLeftInYear = $datetimeStartCurrentCycle->diffInDays($startNextYear);
@@ -107,6 +108,59 @@ class AiracCalcService
         }
 
         return $year . str_pad((string)$numCycle, 2, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Получение массива дат вступления в силу циклов AIRAC из интервала, полученного по необязательным параметрам $start и $end.
+     * Если параметры не переданы, то используется даты 2016-01-07 - 2040-12-06.
+     *
+     * @param string $start
+     * @param string $end
+     * @return Collection
+     */
+    public function getEffectiveDates(string $start = '2016-01-07', string $end = '2040-12-06'): Collection
+    {
+        $startAt = Carbon::createFromDate($start);
+        $endAt = Carbon::createFromDate($end);
+        $diffInDays = $startAt->diffInDays($endAt);
+
+        $effectiveDates = collect([]);
+
+        for ($i = 0; $i < $diffInDays; $i++) {
+            $cycleDay = $this->getCycleDay($startAt);
+            if ($cycleDay === 1) {
+                $effectiveDates->push($startAt->format('Y-m-d'));
+            }
+            $startAt->addDay();
+        }
+
+        return $effectiveDates->groupBy(function ($date, $key) {
+            return substr($date, 0, 4);
+        });
+    }
+
+    /**
+     * Вывод массива дат вступления в силу циклов AIRAC из интервала, полученного по необязательным параметрам $start и $end.
+     * Если параметры не переданы, то используется даты 2016-01-07 - 2040-12-06.
+     * https://en.wikipedia.org/wiki/Aeronautical_Information_Publication
+     *
+     * @param string $start
+     * @param string $end
+     * @return void
+     */
+    public function showEffectiveDates(string $start = '2016-01-07', string $end = '2040-12-06'): void
+    {
+        $grouped = $this->getEffectiveDates($start, $end);
+
+        $result = '';
+        $grouped->each(function (Collection $yearDates, string $year) use (&$result) {
+            $result .= PHP_EOL . "  $year year" . PHP_EOL;
+            $yearDates->each(function (string $date, $key) use (&$result) {
+                $result .= str_pad((string)++$key, 2, ' ', STR_PAD_LEFT). ' ' . $date . PHP_EOL;
+            });
+        });
+
+        echo $result;
     }
 
     /**
