@@ -11,6 +11,7 @@
         "nunomaduro/collision": "^6.2"
     },
     "license": "MIT",
+    "version": "0.0.4",
     "autoload": {
         "psr-4": {
             "Yakoffka\\AiracCalc\\": "src/"

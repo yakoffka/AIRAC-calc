@@ -89,25 +89,7 @@ class AiracCalcService
     {
         $datetime = $this->normalizeDate($datetime);
 
-        $cycleDay = $this->getCycleDay($datetime);
-        $datetimeStartCurrentCycle = $datetime->subDays($cycleDay - 1);
-        $dayOfYear = $datetimeStartCurrentCycle->dayOfYear();
-        $numCycle = intdiv($dayOfYear, $this::DAYS_IN_CYCLE) + 1;
-
-        $startNextYear = Carbon::createFromDate($datetimeStartCurrentCycle->year + 1, 1, 1);
-        $startNextYear->setTime(0, 0);
-
-        $daysLeftInYear = $datetimeStartCurrentCycle->diffInDays($startNextYear);
-
-        if (intdiv($daysLeftInYear, $this::DAYS_IN_CYCLE) > 0) {
-            $year = $datetime->format('y');
-            $numCycle++;
-        } else {
-            $year = $startNextYear->format('y');
-            $numCycle = 1;
-        }
-
-        return $year . str_pad((string)$numCycle, 2, '0', STR_PAD_LEFT);
+        return $this->getCurrentCycle($datetime->addDays($this::DAYS_IN_CYCLE));
     }
 
     /**
@@ -134,7 +116,7 @@ class AiracCalcService
             $startAt->addDay();
         }
 
-        return $effectiveDates->groupBy(function ($date, $key) {
+        return $effectiveDates->groupBy(function ($date) {
             return substr($date, 0, 4);
         });
     }
