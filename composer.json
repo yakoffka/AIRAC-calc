@@ -6,7 +6,9 @@
         "nesbot/carbon": "^2.66"
     },
     "require-dev": {
-        "orchestra/testbench": "^7.22"
+        "orchestra/testbench": "^7.22",
+        "phpunit/phpunit": "9.6.x-dev",
+        "nunomaduro/collision": "^6.2"
     },
     "license": "MIT",
     "autoload": {

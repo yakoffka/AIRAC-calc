@@ -2,3 +2,4 @@
 /composer.lock
 note.txt
 .idea/
+.phpunit.result.cache
