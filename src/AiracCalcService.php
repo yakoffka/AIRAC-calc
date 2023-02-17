@@ -79,6 +79,20 @@ class AiracCalcService
     }
 
     /**
+     * Получение цикла AIRAC, предшествующего текущему для переданной (или текущей) даты.
+     * При передаче даты 2023-02-08 получим '2213'
+     *
+     * @param Carbon|null $datetime
+     * @return string
+     */
+    public function getPrevCycle(?Carbon $datetime = null): string
+    {
+        $datetime = $this->normalizeDate($datetime);
+
+        return $this->getCurrentCycle($datetime->subDays($this::DAYS_IN_CYCLE));
+    }
+
+    /**
      * Получение цикла AIRAC, следующего за текущим для переданной (или текущей) даты.
      * При передаче даты 2023-02-08 получим '2302'
      *

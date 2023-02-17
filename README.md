@@ -18,9 +18,10 @@ composer require yakoffka/airac-calc 0.0.3
 
 
 ## Использование
-Пакет предоставляет три метода, принимающих необязательный параметр Carbon $date:
-- getCycleDay(?Carbon $date): int - получение номера дня в цикле AIRAC для переданной даты;
+Пакет предоставляет четыре метода, принимающих необязательный параметр Carbon $date:
+- getCycleDay(?Carbon $date): int (от 1 до 28) - получение номера дня в цикле AIRAC для переданной даты;
 - getCurrentCycle(?Carbon $date): string - получение текущего цикла AIRAC для переданной даты;
+- getPrevCycle(?Carbon $date): string - получение цикла AIRAC, предшествующего текущему для переданной даты.
 - getNextCycle(?Carbon $date): string - получение цикла AIRAC, следующего за текущим для переданной даты.
 
 При отсутствии параметра расчет ведется относительно текущей даты.
@@ -31,17 +32,19 @@ $date = \Carbon\Carbon::createFromDate(2023, 2, 8);
 
 AiracCalc::getCycleDay($date);         //  14
 AiracCalc::getCurrentCycle($date);     //  "2301"
+AiracCalc::getPrevCycle($date);        //  "2213"
 AiracCalc::getNextCycle($date);        //  "2302"
 ```
 
 ### примеры использования без указания даты:
 ```
-AiracCalc::getCycleDay();       //  14 - число от 1 до 28
+AiracCalc::getCycleDay();       //  14
 AiracCalc::getCurrentCycle();   //  "2301"
+AiracCalc::getPrevCycle();      //  "2213"
 AiracCalc::getNextCycle();      //  "2302"
 ```
 
-## Дополнительный метод showEffectiveDates()
+## Дополнительный метод showEffectiveDates() \[доступен с версии 0.0.4\]
 Пакет предоставляет также дополнительный метод showEffectiveDates(), который выводит календарь циклов на запрошенный период
 
 ### пример использования:
