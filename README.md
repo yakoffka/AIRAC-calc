@@ -14,7 +14,7 @@ AIRAC - Aeronautical Information Regulation And Control (Регламентир�
 
 ## Установка
 ```
-composer require yakoffka/airac-calc 0.0.3 
+composer require yakoffka/airac-calc
 ```
 
 
