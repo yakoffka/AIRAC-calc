@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Yakoffka\AiracCalc\Tests\Unit;
 
-use Carbon\Carbon;
 use Yakoffka\AiracCalc\Tests\TestCase;
 
 /**
@@ -12,13 +11,13 @@ use Yakoffka\AiracCalc\Tests\TestCase;
 class GetCurrentCycleTest extends TestCase
 {
     /**
-     * Получение ожидаемых результатов для выборочных случаев
+     * Получение массива, содержащего входной параметр и ожидаемый результат для выборочных случаев
      *
      * @return array
      */
     public function provider(): array
     {
-        $sets = [
+        return [
             // 01-ый день
             ['2016-01-07', '1601'], // 01-го цикла
             ['2016-05-26', '1606'], // 06-го цикла
@@ -26,6 +25,7 @@ class GetCurrentCycleTest extends TestCase
             ['2016-12-08', '1613'], // 13-го (последнего) цикла в невисокосном году
             ['2020-12-03', '2013'], // 13-го (предпоследнего) цикла в високосном году
             ['2020-12-31', '2014'], // 14-го (предпоследнего) цикла в високосном году
+            ['2021-01-28', '2101'], // 01-го цикла, следующего за високосным годом
 
             // 28-ой день
             ['2016-02-03', '1601'], // 01-го цикла
@@ -34,21 +34,28 @@ class GetCurrentCycleTest extends TestCase
             ['2017-01-04', '1613'], // 13-го (последнего) цикла в невисокосном году
             ['2020-12-30', '2013'], // 13-го (предпоследнего) цикла в високосном году
             ['2021-01-27', '2014'], // 14-го (предпоследнего) цикла в високосном году
+            ['2021-02-24', '2101'], // 01-го цикла, следующего за високосным годом
         ];
-
-        return array_map(static function (array $set) {
-            return [Carbon::createFromDate(...(explode('-', $set[0]))), $set[1]];
-        }, $sets);
     }
 
     /**
      * @test
      * @dataProvider provider
      */
-    public function get_current_cycle(Carbon $date, string $expected): void
+    public function get_current_cycle_with_arg(string $date, string $expected): void
     {
         $actual = $this->service->getCurrentCycle($date);
 
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @test
+     */
+    public function get_current_cycle_without_arg(): void
+    {
+        $actual = $this->service->getCurrentCycle();
+
+        $this->assertSame(4, strlen($actual));
     }
 }

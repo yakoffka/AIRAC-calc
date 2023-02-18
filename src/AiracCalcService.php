@@ -23,9 +23,12 @@ class AiracCalcService
     public const DAYS_IN_CYCLE = 28;
 
     /**
-     * Массив даты первого дня эталонного (для данного класса) первого цикла AIRAC
+     * Массив даты первого дня эталонного (для данного класса) первого цикла AIRAC.
+     * В качестве эталона принимаю первый цикл AIRAC 2023 года.
      */
     public const STANDARD_DATA = [2023, 1, 26];
+
+    private const DUMP_FORMAT = 'Y-m-d H:i:s';
 
     /**
      * @var Carbon|null Дата первого дня эталонного (для данного класса) первого цикла AIRAC
@@ -42,16 +45,14 @@ class AiracCalcService
 
     /**
      * Получение дня цикла AIRAC для переданной (или текущей) даты: от 1 до 28
-     * При передаче даты 2023-02-08 получим '2301'
      *
-     * @param Carbon|null $datetime
+     * @param string|null $dateString Дата в строковом представлении 'Y-m-d'
      * @return int
      */
-    public function getCycleDay(?Carbon $datetime = null): int
+    public function getCycleDay(?string $dateString = null): int
     {
-        $datetime = $this->normalizeDate($datetime);
-
-        $signDiffInDays = $this->getSignDiffInDays($datetime);
+        $carbonDate = $this->toCarbonDate($dateString);
+        $signDiffInDays = $this->getSignDiffInDays($carbonDate);
         $modulo = $signDiffInDays % self::DAYS_IN_CYCLE;
 
         $cycleDay = $modulo < 0 ? 28 + $modulo : $modulo;
@@ -61,57 +62,79 @@ class AiracCalcService
 
     /**
      * Получение цикла AIRAC для переданной (или текущей) даты.
-     * При передаче даты 2023-02-08 получим '2301'
      *
-     * @param Carbon|null $datetime
+     * @param string|null $dateString Дата в строковом представлении 'Y-m-d'
      * @return string
      */
-    public function getCurrentCycle(?Carbon $datetime = null): string
+    public function getCurrentCycle(?string $dateString = null): string
     {
-        $datetime = $this->normalizeDate($datetime);
+        $cycleDay = $this->getCycleDay($dateString);
+        $firstDay = $this->toCarbonDate($dateString)->subDays($cycleDay - 1);
+        $dayOfYear = $firstDay->dayOfYear();
+        $numCycle = intdiv($dayOfYear - 1, $this::DAYS_IN_CYCLE) + 1;
 
-        $cycleDay = $this->getCycleDay($datetime);
-        $datetimeStartCurrentCycle = $datetime->subDays($cycleDay);
-        $dayOfYear = $datetimeStartCurrentCycle->dayOfYear();
-        $numCycle = intdiv($dayOfYear, $this::DAYS_IN_CYCLE) + 1;
-
-        return $datetime->format('y') . str_pad((string)$numCycle, 2, '0', STR_PAD_LEFT);
+        return $firstDay->format('y') . str_pad((string)$numCycle, 2, '0', STR_PAD_LEFT);
     }
 
     /**
      * Получение цикла AIRAC, предшествующего текущему для переданной (или текущей) даты.
-     * При передаче даты 2023-02-08 получим '2213'
      *
-     * @param Carbon|null $datetime
+     * @param string|null $dateString Дата в строковом представлении 'Y-m-d'
      * @return string
      */
-    public function getPrevCycle(?Carbon $datetime = null): string
+    public function getPrevCycle(?string $dateString = null): string
     {
-        $datetime = $this->normalizeDate($datetime);
+        $dateFromPrevCycle = $this->toCarbonDate($dateString)->subDays($this::DAYS_IN_CYCLE);
 
-        return $this->getCurrentCycle($datetime->subDays($this::DAYS_IN_CYCLE));
+        return $this->getCurrentCycle($dateFromPrevCycle->format('Y-m-d'));
     }
 
     /**
      * Получение цикла AIRAC, следующего за текущим для переданной (или текущей) даты.
-     * При передаче даты 2023-02-08 получим '2302'
      *
-     * @param Carbon|null $datetime
+     * @param string|null $dateString Дата в строковом представлении 'Y-m-d'
      * @return string
      */
-    public function getNextCycle(?Carbon $datetime = null): string
+    public function getNextCycle(?string $dateString = null): string
     {
-        $datetime = $this->normalizeDate($datetime);
+        $dateFromNextCycle = $this->toCarbonDate($dateString)->addDays($this::DAYS_IN_CYCLE);
 
-        return $this->getCurrentCycle($datetime->addDays($this::DAYS_IN_CYCLE));
+        return $this->getCurrentCycle($dateFromNextCycle->format('Y-m-d'));
+    }
+
+    /**
+     * Получение цикла AIRAC, предшествующего переданному циклу.
+     *
+     * @param string $airacCycle Идентификатор цикла AIRAC
+     * @return string
+     */
+    public function getPrevByAirac(string $airacCycle): string
+    {
+        $firstDay = $this->getFirstDayByAirac($airacCycle);
+
+        return $this->getPrevCycle($firstDay->format('Y-m-d'));
+    }
+
+    /**
+     * Получение цикла AIRAC, следующего за переданным циклом.
+     * При передаче '2213' получим '2301'
+     *
+     * @param string $airacCycle Идентификатор цикла AIRAC
+     * @return string
+     */
+    public function getNextByAirac(string $airacCycle): string
+    {
+        $firstDay = $this->getFirstDayByAirac($airacCycle);
+
+        return $this->getNextCycle($firstDay->format('Y-m-d'));
     }
 
     /**
      * Получение массива дат вступления в силу циклов AIRAC из интервала, полученного по необязательным параметрам $start и $end.
-     * Если параметры не переданы, то используется даты 2016-01-07 - 2040-12-06.
+     * Если параметры не переданы, то используется даты '2016-01-07' - '2040-12-06'.
      *
-     * @param string $start
-     * @param string $end
+     * @param string $start Дата в строковом представлении 'Y-m-d'
+     * @param string $end Дата в строковом представлении 'Y-m-d'
      * @return Collection
      */
     public function getEffectiveDates(string $start = '2016-01-07', string $end = '2040-12-06'): Collection
@@ -123,36 +146,37 @@ class AiracCalcService
         $effectiveDates = collect([]);
 
         for ($i = 0; $i < $diffInDays; $i++) {
-            $cycleDay = $this->getCycleDay($startAt);
+            $cycleDay = $this->getCycleDay($startAt->format('Y-m-d'));
             if ($cycleDay === 1) {
                 $effectiveDates->push($startAt->format('Y-m-d'));
             }
             $startAt->addDay();
         }
 
-        return $effectiveDates->groupBy(function ($date) {
-            return substr($date, 0, 4);
+        return $effectiveDates->groupBy(function (string $dateString) {
+            return substr($dateString, 0, 4);
         });
     }
 
     /**
      * Вывод массива дат вступления в силу циклов AIRAC из интервала, полученного по необязательным параметрам $start и $end.
-     * Если параметры не переданы, то используется даты 2016-01-07 - 2040-12-06.
-     * https://en.wikipedia.org/wiki/Aeronautical_Information_Publication
+     * Если параметры не переданы, то используется даты '2016-01-07' - '2040-12-06'.
+     * Сравнение с источником данных https://en.wikipedia.org/wiki/Aeronautical_Information_Publication
      *
-     * @param string $start
-     * @param string $end
+     * @param string $start Дата в строковом представлении 'Y-m-d'
+     * @param string $end Дата в строковом представлении 'Y-m-d'
      * @return void
      */
     public function showEffectiveDates(string $start = '2016-01-07', string $end = '2040-12-06'): void
     {
         $grouped = $this->getEffectiveDates($start, $end);
+        $eol = PHP_EOL . "        ";
 
         $result = '';
-        $grouped->each(function (Collection $yearDates, string $year) use (&$result) {
-            $result .= PHP_EOL . "  $year year" . PHP_EOL;
-            $yearDates->each(function (string $date, $key) use (&$result) {
-                $result .= str_pad((string)++$key, 2, ' ', STR_PAD_LEFT). ' ' . $date . PHP_EOL;
+        $grouped->each(function (Collection $yearDates, string $year) use (&$result, $eol) {
+            $result .= "$eol  $year year$eol";
+            $yearDates->each(function (string $date, $key) use (&$result, $eol) {
+                $result .= str_pad((string)++$key, 2, ' ', STR_PAD_LEFT) . ' ' . $date . $eol;
             });
         });
 
@@ -172,30 +196,51 @@ class AiracCalcService
      * Получение знаковой разницы между эталонной и переданной датами.
      * Если переданная дата находится в прошлом относительно эталонной, то возвращает отрицательное значение
      *
-     * @param Carbon $datetime
+     * @param Carbon $date
      * @return int
      */
-    private function getSignDiffInDays(Carbon $datetime): int
+    private function getSignDiffInDays(Carbon $date): int
     {
-        $diffInDays = $this->standard->diffInDays($datetime);
-        $sign = $this->standard->greaterThan($datetime) ? -1 : 1;
+        $diffInDays = $this->standard->diffInDays($date);
+        $sign = $this->standard->greaterThan($date) ? -1 : 1;
 
         return $sign * $diffInDays;
     }
 
     /**
-     * Нормализация даты:
-     *  - установка текущего значения, если дата не передана;
-     *  - установка времени в 00:00
+     * Преобразование даты в строковом представлении в экземпляр класса Carbon:
+     *  - установка текущей даты, если аргумент равен null;
+     *  - сброс времени на 00:00
      *
-     * @param Carbon|null $datetime
+     * @param string|null $date
      * @return Carbon
      */
-    private function normalizeDate(?Carbon $datetime): Carbon
+    private function toCarbonDate(?string $date): Carbon
     {
-        $datetime ??= now();
-        $datetime->setTime(0, 0);
+        if ($date === null) {
+            return today();
+        }
 
-        return $datetime;
+        return Carbon::createFromFormat('Y-m-d', $date)->setTime(0, 0);
+    }
+
+    /**
+     * Получение даты первого дня AIRAC цикла по его идентификатору
+     *
+     * @param string $airacCycle
+     * @return Carbon
+     */
+    private function getFirstDayByAirac(string $airacCycle): Carbon
+    {
+        $firstDay = $this->standard;
+        $method = substr($airacCycle, 0, 2) < $firstDay->format('y')
+            ? 'subDays'
+            : 'addDays';
+
+        do {
+            $firstDay->$method($this::DAYS_IN_CYCLE);
+        } while ($this->getCurrentCycle($firstDay->format('Y-m-d')) !== $airacCycle);
+
+        return $firstDay;
     }
 }

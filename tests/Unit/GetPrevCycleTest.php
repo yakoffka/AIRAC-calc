@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Yakoffka\AiracCalc\Tests\Unit;
 
-use Carbon\Carbon;
 use Yakoffka\AiracCalc\Tests\TestCase;
 
 /**
@@ -12,13 +11,13 @@ use Yakoffka\AiracCalc\Tests\TestCase;
 class GetPrevCycleTest extends TestCase
 {
     /**
-     * Получение ожидаемых результатов для выборочных случаев
+     * Получение массива, содержащего входной параметр и ожидаемый результат для выборочных случаев
      *
      * @return array
      */
     public function provider(): array
     {
-        $sets = [
+        return [
             // 01-ый день
             ['2016-01-07', '1513'], // 01-го цикла
             ['2016-05-26', '1605'], // 06-го цикла
@@ -37,17 +36,13 @@ class GetPrevCycleTest extends TestCase
             ['2021-01-27', '2013'], // 14-го (предпоследнего) цикла в високосном году
             ['2021-02-24', '2014'], // 01-го цикла, следующего за високосным годом
         ];
-
-        return array_map(static function (array $set) {
-            return [Carbon::createFromDate(...(explode('-', $set[0]))), $set[1]];
-        }, $sets);
     }
 
     /**
      * @test
      * @dataProvider provider
      */
-    public function get_prev_cycle(Carbon $date, string $expected): void
+    public function get_prev_cycle(string $date, string $expected): void
     {
         $actual = $this->service->getPrevCycle($date);
 
