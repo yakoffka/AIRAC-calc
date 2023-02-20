@@ -237,9 +237,10 @@ class AiracCalcService
             ? 'subDays'
             : 'addDays';
 
-        do {
+        while ($this->getCurrentCycle($firstDay->format('Y-m-d')) !== $airacCycle) {
             $firstDay->$method($this::DAYS_IN_CYCLE);
-        } while ($this->getCurrentCycle($firstDay->format('Y-m-d')) !== $airacCycle);
+            // dump($firstDay->format($this::DUMP_FORMAT));
+        }
 
         return $firstDay;
     }
