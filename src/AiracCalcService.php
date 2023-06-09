@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Yakoffka\AiracCalc;
 
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
 /**
@@ -29,24 +30,24 @@ class AiracCalcService
     public const STANDARD_CYCLE = '2301';
 
     /**
-     * Массив даты первого дня эталонного (для данного класса) первого цикла AIRAC.
+     * Дата первого дня эталонного (для данного класса) первого цикла AIRAC в строковом представлении.
      * В качестве эталона принимаю первый цикл AIRAC 2023 года.
      */
-    public const STANDARD_DATA = [2023, 1, 26];
+    public const STANDARD_DATA = '2023-01-26';
 
     private const DUMP_FORMAT = 'Y-m-d H:i:s';
 
     /**
-     * @var Carbon|null Дата первого дня эталонного (для данного класса) первого цикла AIRAC
+     * @var CarbonImmutable|null Дата первого дня эталонного (для данного класса) первого цикла AIRAC
      */
-    public ?Carbon $standard = null;
+    public ?CarbonImmutable $standardFirstDay = null;
 
     /**
      * Установка значения даты начала эталонного первого цикла AIRAC
      */
     public function __construct()
     {
-        $this->setStandardDateTime();
+        $this->setStandardFirstDay();
     }
 
     /**
@@ -57,8 +58,8 @@ class AiracCalcService
      */
     public function getCycleDay(?string $dateString = null): int
     {
-        $carbonDate = $this->toCarbonDate($dateString);
-        $signDiffInDays = $this->getSignDiffInDays($carbonDate);
+        $carbonDate = $this->toCarbonImmutableDate($dateString);
+        $signDiffInDays = $this->getSignDiffToStandardDateInDays($carbonDate);
         $modulo = $signDiffInDays % self::DAYS_IN_CYCLE;
 
         $cycleDay = $modulo < 0 ? 28 + $modulo : $modulo;
@@ -75,7 +76,7 @@ class AiracCalcService
     public function getCurrentCycle(?string $dateString = null): string
     {
         $cycleDay = $this->getCycleDay($dateString);
-        $firstDay = $this->toCarbonDate($dateString)->subDays($cycleDay - 1);
+        $firstDay = $this->toCarbonImmutableDate($dateString)->subDays($cycleDay - 1);
         $dayOfYear = $firstDay->dayOfYear();
         $numCycle = intdiv($dayOfYear - 1, $this::DAYS_IN_CYCLE) + 1;
 
@@ -90,9 +91,9 @@ class AiracCalcService
      */
     public function getPrevCycle(?string $dateString = null): string
     {
-        $dateFromPrevCycle = $this->toCarbonDate($dateString)->subDays($this::DAYS_IN_CYCLE);
+        $dateFromPrevCycle = $this->toCarbonImmutableDate($dateString)->subDays($this::DAYS_IN_CYCLE);
 
-        return $this->getCurrentCycle($dateFromPrevCycle->format('Y-m-d'));
+        return $this->getCurrentCycle($dateFromPrevCycle->toDateString());
     }
 
     /**
@@ -103,9 +104,9 @@ class AiracCalcService
      */
     public function getNextCycle(?string $dateString = null): string
     {
-        $dateFromNextCycle = $this->toCarbonDate($dateString)->addDays($this::DAYS_IN_CYCLE);
+        $dateFromNextCycle = $this->toCarbonImmutableDate($dateString)->addDays($this::DAYS_IN_CYCLE);
 
-        return $this->getCurrentCycle($dateFromNextCycle->format('Y-m-d'));
+        return $this->getCurrentCycle($dateFromNextCycle->toDateString());
     }
 
     /**
@@ -118,7 +119,7 @@ class AiracCalcService
     {
         $firstDay = $this->getFirstDayByAirac($airacCycle);
 
-        return $this->getPrevCycle($firstDay->format('Y-m-d'));
+        return $this->getPrevCycle($firstDay->toDateString());
     }
 
     /**
@@ -131,7 +132,7 @@ class AiracCalcService
     {
         $firstDay = $this->getFirstDayByAirac($airacCycle);
 
-        return $this->getNextCycle($firstDay->format('Y-m-d'));
+        return $this->getNextCycle($firstDay->toDateString());
     }
 
     /**
@@ -145,15 +146,15 @@ class AiracCalcService
     public function getEffectiveDates(string $start = '2016-01-07', string $end = '2040-12-06'): Collection
     {
         $startAt = Carbon::createFromDate($start);
-        $endAt = Carbon::createFromDate($end);
+        $endAt = CarbonImmutable::createFromDate($end);
         $diffInDays = $startAt->diffInDays($endAt);
 
         $effectiveDates = collect([]);
 
         for ($i = 0; $i < $diffInDays; $i++) {
-            $cycleDay = $this->getCycleDay($startAt->format('Y-m-d'));
+            $cycleDay = $this->getCycleDay($startAt->toDateString());
             if ($cycleDay === 1) {
-                $effectiveDates->push($startAt->format('Y-m-d'));
+                $effectiveDates->push($startAt->toDateString());
             }
             $startAt->addDay();
         }
@@ -161,41 +162,6 @@ class AiracCalcService
         return $effectiveDates->groupBy(function (string $dateString) {
             return substr($dateString, 0, 4);
         });
-    }
-
-    /**
-     * Получение даты начала цикла AIRAC
-     *
-     * @param string $cycle
-     * @return string
-     */
-    public function getStartDate(string $cycle): string
-    {
-        $lkj = (int)$cycle - (int)self::STANDARD_CYCLE;
-        if ($lkj === 0) {
-            return $this->standard->format('Y-m-d');
-
-        }
-
-        $desiredCarbon = $this->standard;
-        if ($lkj > 0) {
-            while (true) {
-                $desiredDate = $desiredCarbon->addDays(self::DAYS_IN_CYCLE)->format('Y-m-d');
-                $desiredCycle = $this->getCurrentCycle($desiredDate);
-                if ($desiredCycle === $cycle) {
-                    return $desiredDate;
-                }
-            }
-
-        } else {
-            while (true) {
-                $desiredDate = $desiredCarbon->subDays(self::DAYS_IN_CYCLE)->format('Y-m-d');
-                $desiredCycle = $this->getCurrentCycle($desiredDate);
-                if ($desiredCycle === $cycle) {
-                    return $desiredDate;
-                }
-            }
-        }
     }
 
     /**
@@ -207,8 +173,7 @@ class AiracCalcService
      */
      public function getDayDate(int $cycleDay, string $cycle): string
      {
-         return Carbon::createFromFormat('Y-m-d', $this->getStartDate($cycle))
-             ->addDays($cycleDay -1)->format('Y-m-d');
+         return $this->getFirstDayByAirac($cycle)->addDays($cycleDay -1)->toDateString();
      }
 
     // /**
@@ -219,7 +184,7 @@ class AiracCalcService
     //  */
     // public function getSubYearCycle(): string
     // {
-    //     return $this->getCurrentCycle(now()->subYear()->format('Y-m-d'));
+    //     return $this->getCurrentCycle(now()->subYear()->toDateString());
     // }
 
     /**
@@ -250,25 +215,26 @@ class AiracCalcService
     /**
      * Установка даты начала эталонного (для данного класса) первого цикла AIRAC.
      */
-    private function setStandardDateTime(): void
+    private function setStandardFirstDay(): void
     {
-        $this->standard = Carbon::createFromDate(...$this::STANDARD_DATA);
-        $this->standard->setTime(0, 0);
+        $this->standardFirstDay = $this->toCarbonImmutableDate(self::STANDARD_DATA);
     }
 
     /**
-     * Получение знаковой разницы между эталонной и переданной датами.
-     * Если переданная дата находится в прошлом относительно эталонной, то возвращает отрицательное значение
+     * Преобразование даты в строковом представлении в экземпляр класса CarbonImmutable:
+     *  - установка текущей даты, если аргумент равен null;
+     *  - сброс времени на 00:00
      *
-     * @param Carbon $date
-     * @return int
+     * @param string|null $date
+     * @return CarbonImmutable
      */
-    private function getSignDiffInDays(Carbon $date): int
+    private function toCarbonImmutableDate(?string $date): CarbonImmutable
     {
-        $diffInDays = $this->standard->diffInDays($date);
-        $sign = $this->standard->greaterThan($date) ? -1 : 1;
+        if ($date === null) {
+            return CarbonImmutable::today();
+        }
 
-        return $sign * $diffInDays;
+        return CarbonImmutable::createFromFormat('Y-m-d', $date)->setTime(0, 0);
     }
 
     /**
@@ -282,10 +248,25 @@ class AiracCalcService
     private function toCarbonDate(?string $date): Carbon
     {
         if ($date === null) {
-            return today();
+            return Carbon::today();
         }
 
         return Carbon::createFromFormat('Y-m-d', $date)->setTime(0, 0);
+    }
+
+    /**
+     * Получение знаковой разницы между эталонной и переданной датами.
+     * Если переданная дата находится в прошлом относительно эталонной, то возвращает отрицательное значение
+     *
+     * @param CarbonImmutable $date
+     * @return int
+     */
+    private function getSignDiffToStandardDateInDays(CarbonImmutable $date): int
+    {
+        $diffInDays = $this->standardFirstDay->diffInDays($date);
+        $sign = $this->standardFirstDay->greaterThan($date) ? -1 : 1;
+
+        return $sign * $diffInDays;
     }
 
     /**
@@ -297,12 +278,12 @@ class AiracCalcService
      */
     private function getFirstDayByAirac(string $airacCycle): Carbon
     {
-        $firstDay = $this->standard;
+        $firstDay = $this->toCarbonDate(self::STANDARD_DATA);
         $method = substr($airacCycle, 0, 2) < $firstDay->format('y')
             ? 'subDays'
             : 'addDays';
 
-        while ($this->getCurrentCycle($firstDay->format('Y-m-d')) !== $airacCycle) {
+        while ($this->getCurrentCycle($firstDay->toDateString()) !== $airacCycle) {
             $firstDay->$method($this::DAYS_IN_CYCLE);
             // dump($firstDay->format($this::DUMP_FORMAT));
         }

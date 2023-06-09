@@ -6,10 +6,10 @@ namespace Yakoffka\AiracCalc\Tests\Unit;
 use Yakoffka\AiracCalc\Tests\TestCase;
 
 /**
- * EffectiveDatesTest - тестирование получения и показа дат вступления в силу циклов AIRAC:
+ * Тестирование получения и показа дат вступления в силу циклов AIRAC:
  * методы AiracCalc::getEffectiveDates() и AiracCalc::showEffectiveDates()
  */
-class EffectiveDatesTest extends TestCase
+class GetEffectiveDatesTest extends TestCase
 {
     private const SHOWED_DATES_20160107_20210107 = '
           2016 year

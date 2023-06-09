@@ -26,6 +26,7 @@ class GetPrevByAiracTest extends TestCase
             ['2014', '2013'], // идентификатор 14-го (предпоследнего) цикла в високосном году
             ['2101', '2014'], // идентификатор 01-го цикла, следующего за високосным годом
             ['2301', '2213'], // на сервере приложение падает с ошибкой The separation symbol could not be found
+            ['2302', '2301'], // на сервере приложение падает с ошибкой The separation symbol could not be found
                     // ... #3 /var/www/vendor/yakoffka/airac-calc/src/AiracCalcService.php(71): Yakoffka\\AiracCalc\\AiracCalcService->getCycleDay('10000-01-27')
                     // ... #5 /var/www/vendor/yakoffka/airac-calc/src/AiracCalcService.php(113): Yakoffka\\AiracCalc\\AiracCalcService->getFirstDayByAirac('2301')
         ];
