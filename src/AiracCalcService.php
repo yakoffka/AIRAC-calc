@@ -165,16 +165,42 @@ class AiracCalcService
     }
 
     /**
+     * Вывод массива дат вступления в силу циклов AIRAC из интервала, полученного по необязательным параметрам $start и $end.
+     * Если параметры не переданы, то используется даты '2016-01-07' - '2040-12-06'.
+     * Сравнение с источником данных https://en.wikipedia.org/wiki/Aeronautical_Information_Publication
+     *
+     * @param string $start Дата в строковом представлении 'Y-m-d'
+     * @param string $end Дата в строковом представлении 'Y-m-d'
+     * @return void
+     */
+    public function showEffectiveDates(string $start = '2016-01-07', string $end = '2040-12-06'): void
+    {
+        $datesByYear = $this->getEffectiveDates($start, $end);
+        $eol = PHP_EOL . "        ";
+
+        $result = '';
+        $datesByYear->each(function (Collection $yearDates, string $year) use (&$result, $eol) {
+            $result .= "$eol  $year year$eol";
+            $yearDates->each(function (string $date, $key) use (&$result, $eol, $year) {
+                $result .= (int)$year % 100
+                    . str_pad((string)++$key, 2, '0', STR_PAD_LEFT) . ' ' . $date . $eol;
+            });
+        });
+
+        echo $result;
+    }
+
+    /**
      * Получение даты указанного дня цикла AIRAC
      *
      * @param int $cycleDay
      * @param string $cycle
      * @return string
      */
-     public function getDayDate(int $cycleDay, string $cycle): string
-     {
-         return $this->getFirstDayByAirac($cycle)->addDays($cycleDay -1)->toDateString();
-     }
+    public function getDayDate(int $cycleDay, string $cycle): string
+    {
+        return $this->getFirstDayByAirac($cycle)->addDays($cycleDay - 1)->toDateString();
+    }
 
     // /**
     //  * Получение цикла AIRAC годичной давности.
@@ -188,28 +214,40 @@ class AiracCalcService
     // }
 
     /**
-     * Вывод массива дат вступления в силу циклов AIRAC из интервала, полученного по необязательным параметрам $start и $end.
-     * Если параметры не переданы, то используется даты '2016-01-07' - '2040-12-06'.
-     * Сравнение с источником данных https://en.wikipedia.org/wiki/Aeronautical_Information_Publication
+     * Метод, проверяющий корректность номера цикла AIRAC:
+     *      '2302' -> true;
+     *      '2300' -> false;
+     *      '234v' -> false;
+     *      '23454' -> false;
      *
-     * @param string $start Дата в строковом представлении 'Y-m-d'
-     * @param string $end Дата в строковом представлении 'Y-m-d'
-     * @return void
+     * @param string $cycle
+     * @return bool
      */
-    public function showEffectiveDates(string $start = '2016-01-07', string $end = '2040-12-06'): void
+    public function isValidCycle(string $cycle): bool
     {
-        $grouped = $this->getEffectiveDates($start, $end);
-        $eol = PHP_EOL . "        ";
+        $int = (int)$cycle;
 
-        $result = '';
-        $grouped->each(function (Collection $yearDates, string $year) use (&$result, $eol) {
-            $result .= "$eol  $year year$eol";
-            $yearDates->each(function (string $date, $key) use (&$result, $eol) {
-                $result .= str_pad((string)++$key, 2, ' ', STR_PAD_LEFT) . ' ' . $date . $eol;
-            });
-        });
+        return !(
+            (string)$int !== ltrim($cycle, '0')
+            || ($int < 1 || $int > 9913)
+            || $int % 100 === 0
+            || $this->getNumberCyclesPerYear('20' . intdiv($int, 100)) < $int % 100
+        );
+    }
 
-        echo $result;
+    /**
+     * Получение количества циклов AIRAC в указанном (по умолчанию - в текущем) году
+     *
+     * @param ?string $year - год, в котором необходимо узнать количество циклов AIRAC
+     * @return int
+     * @todo рефакторить?: получить значение через количество дней в году, дату первого дня первого цикла и високосность года
+     */
+    public function getNumberCyclesPerYear(?string $year): int
+    {
+        $year ?? Carbon::now()->format('Y');
+        $datesByYear = ($this->getEffectiveDates($year . '-01-01', ((int)$year + 1) . '-01-01'));
+
+        return $datesByYear->first()->count();
     }
 
     /**
