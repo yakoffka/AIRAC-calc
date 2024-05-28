@@ -1,3 +1,12 @@
+## [Version 0.2.2](https://github.com/yakoffka/AIRAC-calc/releases/tag/0.2.2) (2024-05-28)
+
+### Незначительные изменения
+
+Подняты версии зависимостей[`fa2b992`](https://github.com/yakoffka/AIRAC-calc/commit/fa2b992080c0e51c49ea12877399a9dc99ebb91c):
+- composer update
+- composer bump
+
+
 ## [Version 0.2.1](https://github.com/yakoffka/AIRAC-calc/releases/tag/0.2.1) (2023-06-20)
 
 ### Новые возможности
@@ -9,3 +18,4 @@
 
 ### Незначительные изменения
 - изменен вывод метода getEffectiveDates(): вместо порядкового номера цикла внутри года теперь выводится полный номер цикла (1 -> 2301)
+

@@ -38,6 +38,7 @@ class IsValidCycleTest extends TestCase
             ['-2301', false],
             ['234v', false],
             ['0000', false],
+            ['2000', false],
             ['0', false],
             ['string', false],
             ['9999', false],
