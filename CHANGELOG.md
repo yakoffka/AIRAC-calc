@@ -1,4 +1,13 @@
-## [Version 0.2.3](https://github.com/yakoffka/AIRAC-calc/releases/tag/0.2.2) (2024-05-28)
+## [Version 0.2.4](https://github.com/yakoffka/AIRAC-calc/releases/tag/0.2.4) (2024-05-28)
+
+### Незначительные изменения
+
+Обновление версии зависимостей[`3252c02`](https://github.com/yakoffka/AIRAC-calc/commit/3252c02ef6ead2d28a67089ecb8dd6df375c8ebb):
+- composer update
+- composer bump
+
+
+## [Version 0.2.3](https://github.com/yakoffka/AIRAC-calc/releases/tag/0.2.3) (2024-05-28)
 
 ### Незначительные изменения
 
@@ -12,7 +21,7 @@
 
 ### Незначительные изменения
 
-Подняты версии зависимостей[`fa2b992`](https://github.com/yakoffka/AIRAC-calc/commit/fa2b992080c0e51c49ea12877399a9dc99ebb91c):
+Обновление версии зависимостей[`fa2b992`](https://github.com/yakoffka/AIRAC-calc/commit/fa2b992080c0e51c49ea12877399a9dc99ebb91c):
 - composer update
 - composer bump
 
