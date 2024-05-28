@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Yakoffka\AiracCalc\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Yakoffka\AiracCalc\Tests\TestCase;
 
 /**
@@ -12,10 +14,8 @@ class GetNextCycleTest extends TestCase
 {
     /**
      * Получение массива, содержащего входной параметр и ожидаемый результат для выборочных случаев
-     *
-     * @return array
      */
-    public function provider(): array
+    public static function provider(): array
     {
         return [
             // 01-ый день
@@ -38,10 +38,8 @@ class GetNextCycleTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     * @dataProvider provider
-     */
+    #[Test]
+    #[DataProvider('provider')]
     public function get_next_cycle_with_arg(string $date, string $expected): void
     {
         $actual = $this->service->getNextCycle($date);
@@ -49,9 +47,7 @@ class GetNextCycleTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function get_next_cycle_without_arg(): void
     {
         $actual = $this->service->getNextCycle();

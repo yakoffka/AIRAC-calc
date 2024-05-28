@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Yakoffka\AiracCalc\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Yakoffka\AiracCalc\Tests\TestCase;
 
 /**
@@ -12,10 +14,8 @@ class GetDayDateTest extends TestCase
 {
     /**
      * Получение массива, содержащего входной параметр и ожидаемый результат для выборочных случаев
-     *
-     * @return array
      */
-    public function provider(): array
+    public static function provider(): array
     {
         return [
             [1,'2301', '2023-01-26'],
@@ -29,10 +29,8 @@ class GetDayDateTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     * @dataProvider provider
-     */
+    #[Test]
+    #[DataProvider('provider')]
     public function get_start_date(int $cycleDay, string $cycle, string $expected): void
     {
         $actual = $this->service->getDayDate($cycleDay, $cycle);

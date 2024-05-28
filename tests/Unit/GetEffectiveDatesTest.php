@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Yakoffka\AiracCalc\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use Yakoffka\AiracCalc\Tests\TestCase;
 
 /**
@@ -94,9 +95,8 @@ class GetEffectiveDatesTest extends TestCase
      *      полученная коллекция должна состоять из 5 вложенных коллекций;
      *      каждая вложенная коллекция (кроме последней) должна содержать 13 циклов
      *      последняя вложенная коллекция должна содержать 14 циклов (2020 - високосный год AIRAC)
-     *
-     * @test
      */
+    #[Test]
     public function get_effective_dates_count(): void
     {
         $effectiveDates = $this->service->getEffectiveDates('2016-01-07', '2021-01-07');
@@ -113,9 +113,8 @@ class GetEffectiveDatesTest extends TestCase
 
     /**
      * Проверка показа дат вступления в силу циклов AIRAC на ограниченном интервале времени (5 лет)
-     *
-     * @test
      */
+    #[Test]
     public function show_effective_dates(): void
     {
         // $this->service->showEffectiveDates('2016-01-07', '2021-01-07');

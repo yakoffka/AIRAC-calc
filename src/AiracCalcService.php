@@ -59,7 +59,7 @@ class AiracCalcService
     public function getCycleDay(?string $dateString = null): int
     {
         $carbonDate = $this->toCarbonImmutableDate($dateString);
-        $signDiffInDays = $this->getSignDiffToStandardDateInDays($carbonDate);
+        $signDiffInDays = (int)$this->standardFirstDay->diffInDays($carbonDate);
         $modulo = $signDiffInDays % self::DAYS_IN_CYCLE;
 
         $cycleDay = $modulo < 0 ? 28 + $modulo : $modulo;
@@ -290,21 +290,6 @@ class AiracCalcService
         }
 
         return Carbon::createFromFormat('Y-m-d', $date)->setTime(0, 0);
-    }
-
-    /**
-     * Получение знаковой разницы между эталонной и переданной датами.
-     * Если переданная дата находится в прошлом относительно эталонной, то возвращает отрицательное значение
-     *
-     * @param CarbonImmutable $date
-     * @return int
-     */
-    private function getSignDiffToStandardDateInDays(CarbonImmutable $date): int
-    {
-        $diffInDays = $this->standardFirstDay->diffInDays($date);
-        $sign = $this->standardFirstDay->greaterThan($date) ? -1 : 1;
-
-        return $sign * $diffInDays;
     }
 
     /**

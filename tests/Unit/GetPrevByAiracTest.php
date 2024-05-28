@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Yakoffka\AiracCalc\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Yakoffka\AiracCalc\Tests\TestCase;
 
 /**
@@ -12,10 +14,8 @@ class GetPrevByAiracTest extends TestCase
 {
     /**
      * Получение массива, содержащего входной параметр и ожидаемый результат для выборочных случаев
-     *
-     * @return array
      */
-    public function provider(): array
+    public static function provider(): array
     {
         return [
             ['1601', '1513'], // идентификатор 01-го цикла
@@ -32,10 +32,8 @@ class GetPrevByAiracTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     * @dataProvider provider
-     */
+    #[Test]
+    #[DataProvider('provider')]
     public function get_prev(string $cycle, string $expected): void
     {
         $actual = $this->service->getPrevByAirac($cycle);

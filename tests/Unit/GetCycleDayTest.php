@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Yakoffka\AiracCalc\Tests\Unit;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Yakoffka\AiracCalc\Tests\TestCase;
 
 /**
@@ -13,10 +15,8 @@ class GetCycleDayTest extends TestCase
 {
     /**
      * Получение массива, содержащего входной параметр и ожидаемый результат для выборочных случаев
-     *
-     * @return string[][]
      */
-    public function provider(): array
+    public static function provider(): array
     {
         return [
             // 01-ый день
@@ -39,10 +39,8 @@ class GetCycleDayTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     * @dataProvider provider
-     */
+    #[Test]
+    #[DataProvider('provider')]
     public function get_cycle_day_with_arg(string $date, int $expected): void
     {
         $actual = $this->service->getCycleDay($date);
@@ -50,9 +48,7 @@ class GetCycleDayTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function get_cycle_day_without_arg(): void
     {
         $actual = $this->service->getCycleDay();
@@ -63,9 +59,8 @@ class GetCycleDayTest extends TestCase
 
     /**
      * Проверка правильного чередования номера дня цикла для каждого дня на протяжении всего тестового интервала
-     *
-     * @test
      */
+    #[Test]
     public function get_cycle_day_correct_sequence(): void
     {
         $currentDay = Carbon::createFromDate($this::START);

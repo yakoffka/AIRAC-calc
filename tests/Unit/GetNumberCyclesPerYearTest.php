@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Yakoffka\AiracCalc\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Yakoffka\AiracCalc\Tests\TestCase;
 
 /**
@@ -12,10 +14,8 @@ class GetNumberCyclesPerYearTest extends TestCase
 {
     /**
      * Получение массива, содержащего входной параметр и ожидаемый результат для выборочных случаев
-     *
-     * @return array
      */
-    public function provider(): array
+    public static function provider(): array
     {
         return [
             ['2016', 13],
@@ -49,10 +49,8 @@ class GetNumberCyclesPerYearTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     * @dataProvider provider
-     */
+    #[Test]
+    #[DataProvider('provider')]
     public function get_number_cycles_per_year(string $year, int $expected): void
     {
         $actual = $this->service->getNumberCyclesPerYear($year);
