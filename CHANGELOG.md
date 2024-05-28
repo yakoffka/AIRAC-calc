@@ -1,3 +1,13 @@
+## [Version 0.2.3](https://github.com/yakoffka/AIRAC-calc/releases/tag/0.2.2) (2024-05-28)
+
+### Незначительные изменения
+
+Удаление устаревших тегов version[`98b8530`](https://github.com/yakoffka/AIRAC-calc/commit/98b85304d4d8358d47d8c8746590d719c5f7d7dd):
+
+- composer.json: The version field is present, it is recommended to leave it out if the package is published on Packagist.
+- docker-compose.yaml:  `version` is obsolete
+
+
 ## [Version 0.2.2](https://github.com/yakoffka/AIRAC-calc/releases/tag/0.2.2) (2024-05-28)
 
 ### Незначительные изменения
