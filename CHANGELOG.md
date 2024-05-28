@@ -1,3 +1,12 @@
+## [Version 0.2.45](https://github.com/yakoffka/AIRAC-calc/releases/tag/0.2.5) (2024-05-28)
+
+### Незначительные изменения
+
+Правка тестов[`5b93c03`](https://github.com/yakoffka/AIRAC-calc/commit/5b93c03ffcab4a9ac57d86137f502829433213bb):
+- перевод тестов на аттрибуты
+- обновление конфигурации
+
+
 ## [Version 0.2.4](https://github.com/yakoffka/AIRAC-calc/releases/tag/0.2.4) (2024-05-28)
 
 ### Незначительные изменения
