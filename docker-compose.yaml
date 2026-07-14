@@ -1,6 +1,6 @@
 services:
   php:
-    image: laravelsail/php82-composer
+    image: laravelsail/php84-composer
     volumes:
       - './:/app'
     working_dir: /app

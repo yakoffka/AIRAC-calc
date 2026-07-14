@@ -3,7 +3,7 @@
     "description": "Laravel package for calculate AIRAC cycles",
     "type": "library",
     "require": {
-        "php": "^8.0",
+        "php": "^8.4",
         "nesbot/carbon": "^3.7.0"
     },
     "require-dev": {
