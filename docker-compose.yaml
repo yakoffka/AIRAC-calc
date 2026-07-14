@@ -5,6 +5,9 @@ services:
       - './:/app'
     working_dir: /app
     user: '1000:1000'
+    environment:
+      COMPOSER_HOME: /tmp/composer
+      COMPOSER_CACHE_DIR: /tmp/composer/cache
     ports:
       - '7000:8000'
     command: php -S 0.0.0.0:8000 -t /app
