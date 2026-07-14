@@ -4,12 +4,12 @@
     "type": "library",
     "require": {
         "php": "^8.0",
-        "nesbot/carbon": "^3.4.0"
+        "nesbot/carbon": "^3.7.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^v9.1.0",
-        "phpunit/phpunit": "^11.0.1",
-        "nunomaduro/collision": "^8.1.0"
+        "orchestra/testbench": "^9.2.0",
+        "phpunit/phpunit": "^11.3.0",
+        "nunomaduro/collision": "^8.4.0"
     },
     "license": "MIT",
     "autoload": {
