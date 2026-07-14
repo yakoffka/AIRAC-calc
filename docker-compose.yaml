@@ -8,6 +8,8 @@ services:
     environment:
       COMPOSER_HOME: /tmp/composer
       COMPOSER_CACHE_DIR: /tmp/composer/cache
+      HOME: /tmp
+      XDG_CONFIG_HOME: /tmp/.config
     ports:
       - '7000:8000'
     command: php -S 0.0.0.0:8000 -t /app
